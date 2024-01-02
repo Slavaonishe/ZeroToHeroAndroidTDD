@@ -1,5 +1,6 @@
 package ru.easycode.zerotoheroandroidtdd
 
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
@@ -13,22 +14,31 @@ import java.lang.Thread.State
 
 class MainActivity : AppCompatActivity() {
 
+    private var state : ru.easycode.zerotoheroandroidtdd.State = ru.easycode.zerotoheroandroidtdd.State.Initial
+
     lateinit var binding: ActivityMainBinding
+
     //private var isTitleTextViewHidden: Boolean = false
-    private lateinit var rootLayout : LinearLayout
-    private lateinit var titleTextView : TextView
+
+    private lateinit var linearLayout : LinearLayout
+    private lateinit var textView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        rootLayout = binding.rootLayout
-        titleTextView = binding.titleTextView
+        linearLayout = binding.rootLayout
+        textView = binding.titleTextView
 
         binding.removeButton.setOnClickListener{
-            rootLayout.removeView(titleTextView)
+            state = ru.easycode.zerotoheroandroidtdd.State.Removed
+            state.apply (linearLayout, textView)
         }
+
+        /*binding.removeButton.setOnClickListener{
+            LinearLayout.removeView(TextView)
+        }*/
 
 
 
@@ -60,10 +70,22 @@ class MainActivity : AppCompatActivity() {
         outState.putBoolean("isTitleTextViewHidden", isTitleTextViewHidden)
 */
     }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-       val removedTextview =  rootLayout.childCount == 1
+        outState.putSerializable(KEY,state)
+
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+      state = savedInstanceState.getSerializable(KEY) as ru.easycode.zerotoheroandroidtdd.State
+
+        state.apply (linearLayout, textView)
+    }
+
+   /* override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+       val removedTextview =  LinearLayout.childCount == 1
         outState.putBoolean(KEY,removedTextview)
 
     }
@@ -72,13 +94,29 @@ class MainActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
         val removedTextview = savedInstanceState.getBoolean(KEY)
         if (removedTextview){
-            rootLayout.removeView(titleTextView)
-        }
-
-    }
-
-    companion object {
-        private const val KEY = "key"
-    }
+            LinearLayout.removeView(TextView)
+        }*/
+   companion object {
+       private const val KEY = "key"
+   }
 }
+interface State: Serializable {
+
+    fun apply (linearLayout : LinearLayout,textView: TextView)
+    object Initial : ru.easycode.zerotoheroandroidtdd.State{
+        override fun apply(linearLayout: LinearLayout, textView: TextView) = Unit
+
+    }
+
+    object Removed : ru.easycode.zerotoheroandroidtdd.State{
+        override fun apply(linearLayout: LinearLayout, textView: TextView) {
+            linearLayout.removeView(textView)
+        }
+    }
+
+
+}
+
+
+
 
