@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.View
+import android.view.View.OnClickListener
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.lifecycle.Lifecycle
@@ -23,18 +25,21 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var linearLayout : LinearLayout
     private lateinit var textView: TextView
+    private lateinit var button: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        button = binding.removeButton
         linearLayout = binding.rootLayout
         textView = binding.titleTextView
 
-        binding.removeButton.setOnClickListener{
+
+        button.setOnClickListener{
             state = ru.easycode.zerotoheroandroidtdd.State.Removed
-            state.apply (linearLayout, textView)
+            state.apply (linearLayout, textView, button)
         }
 
         /*binding.removeButton.setOnClickListener{
@@ -82,7 +87,7 @@ class MainActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
       state = savedInstanceState.getSerializable(KEY) as ru.easycode.zerotoheroandroidtdd.State
 
-        state.apply (linearLayout, textView)
+        state.apply (linearLayout, textView, button)
     }
 
    /* override fun onSaveInstanceState(outState: Bundle) {
@@ -104,15 +109,16 @@ class MainActivity : AppCompatActivity() {
 }
 interface State: Serializable {
 
-    fun apply (linearLayout : LinearLayout,textView: TextView)
+    fun apply (linearLayout : LinearLayout,textView: TextView, button: Button)
     object Initial : ru.easycode.zerotoheroandroidtdd.State{
-        override fun apply(linearLayout: LinearLayout, textView: TextView) = Unit
+        override fun apply(linearLayout: LinearLayout, textView: TextView,button: Button) = Unit
 
     }
 
     object Removed : ru.easycode.zerotoheroandroidtdd.State{
-        override fun apply(linearLayout: LinearLayout, textView: TextView) {
+        override fun apply(linearLayout: LinearLayout, textView: TextView, button: Button) {
             linearLayout.removeView(textView)
+            button.isEnabled=false
         }
     }
 
